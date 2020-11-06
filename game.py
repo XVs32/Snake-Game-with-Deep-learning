@@ -6,22 +6,29 @@ from tqdm import tqdm
 import numpy as np
 
 
-def display_snake(snake_position, display):
+def display_snake(snake_position, display, snake_id):
     for position in snake_position:
-        pygame.draw.rect(display, (255, 0, 0), pygame.Rect(position[0], position[1], 10, 10))
-
+        if snake_id == 1:
+            pygame.draw.rect(display, (255, 0, 0), pygame.Rect(position[0], position[1], 10, 10))
+        else:
+            pygame.draw.rect(display, (0, 0, 255), pygame.Rect(position[0], position[1], 10, 10))
 
 def display_apple(apple_position, display):
     pygame.draw.rect(display, (0, 255, 0), pygame.Rect(apple_position[0], apple_position[1], 10, 10))
 
-
 def starting_positions():
-    snake_start = [100, 100]
-    snake_position = [[100, 100], [90, 100], [80, 100]]
-    apple_position = [random.randrange(1, 50) * 10, random.randrange(1, 50) * 10]
-    score = 3
-
-    return snake_start, snake_position, apple_position, score
+    
+    snake_start_a = [50, 100]
+    snake_position_a = [[50, 100], [40, 100], [30, 100]]
+    
+    snake_start_b = [450, 400]
+    snake_position_b = [[450, 400], [460, 400], [470, 400]]
+    
+    apple_position = [random.randrange(5, 45) * 10, random.randrange(15, 35) * 10]
+    score_a = 3
+    score_b = 3
+    
+    return snake_start_a, snake_position_a, score_a, snake_start_b, snake_position_b, score_b, apple_position
 
 
 def apple_distance_from_snake(apple_position, snake_position):
@@ -156,7 +163,12 @@ def angle_with_apple(snake_position, apple_position):
     return angle, snake_direction_vector, apple_direction_vector_normalized, snake_direction_vector_normalized
 
 
-def play_game(snake_start, snake_position, apple_position, button_direction, score, display, clock):
+def play_game(snake_start_a, snake_position_a, button_direction_a, score_a,\
+              snake_start_b, snake_position_b, button_direction_b, score_b,\
+              apple_position, display, clock):
+    
+    print("into play game")
+    
     crashed = False
     while crashed is not True:
         for event in pygame.event.get():
@@ -165,12 +177,18 @@ def play_game(snake_start, snake_position, apple_position, button_direction, sco
         display.fill((255, 255, 255))
 
         display_apple(apple_position, display)
-        display_snake(snake_position, display)
+        display_snake(snake_position_a, display,1)
+        display_snake(snake_position_b, display,2)
 
-        snake_position, apple_position, score = generate_snake(snake_start, snake_position, apple_position,
-                                                               button_direction, score)
-        pygame.display.set_caption("SCORE: " + str(score))
+        snake_position_a, apple_position, score_a = generate_snake(snake_start_a, snake_position_a, apple_position,
+                                                               button_direction_a, score_a)
+        
+        snake_position_b, apple_position, score_b = generate_snake(snake_start_b, snake_position_b, apple_position,
+                                                               button_direction_b, score_b)
+        
+        pygame.display.set_caption("SCORE_a: " + str(score_a) +" SCORE_b: " + str(score_b))
         pygame.display.update()
-        clock.tick(50000)
-
-        return snake_position, apple_position, score
+        clock.tick(10)
+        
+        
+        return snake_position_a, score_a, snake_position_b, score_b, apple_position
