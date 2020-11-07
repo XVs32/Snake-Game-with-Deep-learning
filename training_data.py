@@ -58,6 +58,11 @@ def generate_training_data(display, clock):
             angle_b, snake_direction_vector_b, apple_direction_vector_normalized_b, snake_direction_vector_normalized_b \
                 = angle_with_apple(snake_position_b, apple_position)
             
+            #print("angle_a" + str(angle_a))
+            #print("angle_b" + str(angle_b))
+            
+            #print("apple_direction_vector_normalized_a" + str(apple_direction_vector_normalized_a[0]) + " " + str(apple_direction_vector_normalized_a[1]))
+            #print("apple_direction_vector_normalized_b" + str(apple_direction_vector_normalized_b[0]) + " " + str(apple_direction_vector_normalized_b[1]))
             
             
             direction_a, button_direction_a = generate_random_direction(snake_position_a, angle_a)
@@ -66,14 +71,12 @@ def generate_training_data(display, clock):
             
             #current_direction_vector, is_front_blocked, is_left_blocked, is_right_blocked = blocked_directions(snake_position)
             
-            front_blocked_distance_a, front_left_blocked_distance_a, front_right_blocked_distance_a,\
-            left_blocked_distance_a, right_blocked_distance_a,\
-            rear_left_blocked_distance_a, rear_right_blocked_distance_a \
+            front_blocked_distance_a,\
+            left_blocked_distance_a, right_blocked_distance_a\
                 = blocked_directions(snake_position_a,snake_position_b)
             
-            front_blocked_distance_b, front_left_blocked_distance_b, front_right_blocked_distance_b,\
-            left_blocked_distance_b, right_blocked_distance_b,\
-            rear_left_blocked_distance_b, rear_right_blocked_distance_b \
+            front_blocked_distance_b,\
+            left_blocked_distance_b, right_blocked_distance_b\
                 = blocked_directions(snake_position_b,snake_position_a)
             
             
@@ -97,28 +100,24 @@ def generate_training_data(display, clock):
             
             
             tem_training_data_x_a.append(
-                [front_blocked_distance_a, front_left_blocked_distance_a, front_right_blocked_distance_a,\
+                [front_blocked_distance_a,\
                  left_blocked_distance_a, right_blocked_distance_a,\
-                 rear_left_blocked_distance_a, rear_right_blocked_distance_a,\
                  snake_direction_vector_normalized_a[0], apple_direction_vector_normalized_a[0],\
                  snake_direction_vector_normalized_a[1], apple_direction_vector_normalized_a[1]])
             
             tem_training_data_x_b.append(
-                [front_blocked_distance_b, front_left_blocked_distance_b, front_right_blocked_distance_b,\
+                [front_blocked_distance_b,\
                  left_blocked_distance_b, right_blocked_distance_b,\
-                 rear_left_blocked_distance_b, rear_right_blocked_distance_b,\
                  snake_direction_vector_normalized_b[0], apple_direction_vector_normalized_b[0],\
                  snake_direction_vector_normalized_b[1], apple_direction_vector_normalized_b[1]])
             
             """snake_position, apple_position, score = play_game(snake_start, snake_position, apple_position,
                                                               button_direction, score, display, clock)"""
-            """snake_position_a, score_a, snake_position_b, score_b, apple_position = play_game(snake_start_a, snake_position_a,\
-                                                                                             button_direction_a, score_a,\
-                                                                                             snake_start_b, snake_position_b,\
-                                                                                             button_direction_b, score_b,\
-                                                                                             apple_position, display, clock)"""
             
             
+            
+            #play_game
+            #play_game_without_gui
             snake_position_a, score_a, snake_position_b, score_b, apple_position = play_game_without_gui(snake_start_a, snake_position_a,\
                                                                                              button_direction_a, score_a,\
                                                                                              snake_start_b, snake_position_b,\

@@ -78,9 +78,8 @@ def run_game_with_ML(model, display, clock):
 ################################################ snake A start ############################################
 ###########################################################################################################
 			
-			front_blocked_distance_a, front_left_blocked_distance_a, front_right_blocked_distance_a,\
+			front_blocked_distance_a,\
 			left_blocked_distance_a, right_blocked_distance_a,\
-			rear_left_blocked_distance_a, rear_right_blocked_distance_a \
 				= blocked_directions(snake_position_a,snake_position_b)
 			
 			
@@ -90,12 +89,9 @@ def run_game_with_ML(model, display, clock):
 			predictions = []
 			
 			predicted_direction = np.argmax(np.array(model.predict(np.array([front_blocked_distance_a, \
-																			 front_left_blocked_distance_a, \
-																			 front_right_blocked_distance_a,\
 																			 left_blocked_distance_a, right_blocked_distance_a,\
-																			 rear_left_blocked_distance_a, rear_right_blocked_distance_a,\
 																			 snake_direction_vector_normalized_a[0], apple_direction_vector_normalized_a[0],\
-																			 snake_direction_vector_normalized_a[1], apple_direction_vector_normalized_a[1]]).reshape(-1,11)))) - 1
+																			 snake_direction_vector_normalized_a[1], apple_direction_vector_normalized_a[1]]).reshape(-1,7)))) - 1
 			
 			new_direction = np.array(snake_position_a[0]) - np.array(snake_position_a[1])
 			if predicted_direction == -1:
@@ -114,9 +110,8 @@ def run_game_with_ML(model, display, clock):
 			
 			
 			training_data_x_a.append(
-				[front_blocked_distance_a, front_left_blocked_distance_a, front_right_blocked_distance_a,\
+				[front_blocked_distance_a,\
 				 left_blocked_distance_a, right_blocked_distance_a,\
-				 rear_left_blocked_distance_a, rear_right_blocked_distance_a,\
 				 snake_direction_vector_normalized_a[0], apple_direction_vector_normalized_a[0],\
 				 snake_direction_vector_normalized_a[1], apple_direction_vector_normalized_a[1]])
 			
@@ -130,24 +125,27 @@ def run_game_with_ML(model, display, clock):
 ################################################ snake B start ############################################
 ###########################################################################################################
 			
-			front_blocked_distance_b, front_left_blocked_distance_b, front_right_blocked_distance_b,\
+			front_blocked_distance_b,\
 			left_blocked_distance_b, right_blocked_distance_b,\
-			rear_left_blocked_distance_b, rear_right_blocked_distance_b \
 				= blocked_directions(snake_position_b,snake_position_a)
 			
 			
 			angle_b, snake_direction_vector_b, apple_direction_vector_normalized_b, snake_direction_vector_normalized_b \
 				= angle_with_apple(snake_position_b, apple_position)
 			
+			#print("angle_a" + str(angle_a))
+			#print("angle_b" + str(angle_b))
+
+			#print("apple_direction_vector_normalized_a" + str(apple_direction_vector_normalized_a[0]) + " " + str(apple_direction_vector_normalized_a[1]))
+			#print("apple_direction_vector_normalized_b" + str(apple_direction_vector_normalized_b[0]) + " " + str(apple_direction_vector_normalized_b[1]))
+
+			
 			predictions = []
 			
 			predicted_direction = np.argmax(np.array(model.predict(np.array([front_blocked_distance_b, \
-																			 front_left_blocked_distance_b, \
-																			 front_right_blocked_distance_b,\
 																			 left_blocked_distance_b, right_blocked_distance_b,\
-																			 rear_left_blocked_distance_b, rear_right_blocked_distance_b,\
 																			 snake_direction_vector_normalized_b[0], apple_direction_vector_normalized_b[0],\
-																			 snake_direction_vector_normalized_b[1], apple_direction_vector_normalized_b[1]]).reshape(-1,11)))) - 1
+																			 snake_direction_vector_normalized_b[1], apple_direction_vector_normalized_b[1]]).reshape(-1,7)))) - 1
 			
 			new_direction = np.array(snake_position_b[0]) - np.array(snake_position_b[1])
 			if predicted_direction == -1:
@@ -165,9 +163,8 @@ def run_game_with_ML(model, display, clock):
 			
 			
 			training_data_x_b.append(
-				[front_blocked_distance_b, front_left_blocked_distance_b, front_right_blocked_distance_b,\
+				[front_blocked_distance_b,\
 				 left_blocked_distance_b, right_blocked_distance_b,\
-				 rear_left_blocked_distance_b, rear_right_blocked_distance_b,\
 				 snake_direction_vector_normalized_b[0], apple_direction_vector_normalized_b[0],\
 				 snake_direction_vector_normalized_b[1], apple_direction_vector_normalized_b[1]])
 			
@@ -184,6 +181,8 @@ def run_game_with_ML(model, display, clock):
 			snake_position_a, score_a, snake_position_b, score_b, apple_position = play_game(snake_start_a, snake_position_a, button_direction_a, score_a,\
 																						snake_start_b, snake_position_b, button_direction_b, score_b,\
 																						apple_position, display, clock)
+			
+			
 			
 		
 		avg_score += max_score
@@ -215,8 +214,9 @@ for i in range(3):
 	max_score, avg_score, training_data_x, training_data_y = run_game_with_ML(model,display,clock)
 	print("Maximum score achieved is:  ", max_score)
 	print("Average score achieved is:  ", avg_score)
+	
 	model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
-	model.fit((np.array(training_data_x).reshape(-1,11)),( np.array(training_data_y).reshape(-1,3)), batch_size = 10,epochs= 3)
+	model.fit((np.array(training_data_x).reshape(-1,7)),( np.array(training_data_y).reshape(-1,3)), batch_size = 10,epochs= 3)
 	model.save_weights('model_' + str(i+1) + '.h5')
 	model_json = model.to_json()
 	with open('model_' + str(i+1) + '.json', 'w') as json_file:

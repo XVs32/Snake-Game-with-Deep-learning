@@ -85,19 +85,17 @@ def blocked_directions(snake_position, rival_snake_position):
     
     
     front_blocked_distance          = get_direction_distance(snake_position, rival_snake_position, current_direction_vector)
-    front_left_blocked_distance     = get_direction_distance(snake_position, rival_snake_position, current_direction_vector+left_direction_vector)
-    front_right_blocked_distance    = get_direction_distance(snake_position, rival_snake_position, current_direction_vector+right_direction_vector)
+    #front_left_blocked_distance     = get_direction_distance(snake_position, rival_snake_position, current_direction_vector+left_direction_vector)
+    #front_right_blocked_distance    = get_direction_distance(snake_position, rival_snake_position, current_direction_vector+right_direction_vector)
     
     left_blocked_distance           = get_direction_distance(snake_position, rival_snake_position, left_direction_vector)
     right_blocked_distance          = get_direction_distance(snake_position, rival_snake_position, right_direction_vector)
     
-    rear_left_blocked_distance      = get_direction_distance(snake_position, rival_snake_position, -current_direction_vector+left_direction_vector)
-    rear_right_blocked_distance     = get_direction_distance(snake_position, rival_snake_position, -current_direction_vector+right_direction_vector)
+    #rear_left_blocked_distance      = get_direction_distance(snake_position, rival_snake_position, -current_direction_vector+left_direction_vector)
+    #rear_right_blocked_distance     = get_direction_distance(snake_position, rival_snake_position, -current_direction_vector+right_direction_vector)
     
-    return front_blocked_distance, front_left_blocked_distance, front_right_blocked_distance,\
-           left_blocked_distance, right_blocked_distance,\
-           rear_left_blocked_distance, rear_right_blocked_distance
-
+    return front_blocked_distance, \
+           left_blocked_distance, right_blocked_distance
 
 
 
@@ -116,9 +114,9 @@ def get_direction_distance(snake_position, rival_snake_position, current_directi
 
 def generate_random_direction(snake_position, angle_with_apple):
     direction = 0
-    if angle_with_apple > 0:
+    if angle_with_apple > 89:
         direction = 1
-    elif angle_with_apple < 0:
+    elif angle_with_apple < -89:
         direction = -1
     else:
         direction = 0
@@ -173,7 +171,7 @@ def angle_with_apple(snake_position, apple_position):
             0] * snake_direction_vector_normalized[1],
         apple_direction_vector_normalized[1] * snake_direction_vector_normalized[1] + apple_direction_vector_normalized[
             0] * snake_direction_vector_normalized[0]) / math.pi
-    return angle, snake_direction_vector, apple_direction_vector_normalized, snake_direction_vector_normalized
+    return angle * 180, snake_direction_vector, apple_direction_vector_normalized, snake_direction_vector_normalized
 
 
 def play_game(snake_start_a, snake_position_a, button_direction_a, score_a,\
@@ -201,7 +199,7 @@ def play_game(snake_start_a, snake_position_a, button_direction_a, score_a,\
         
         pygame.display.set_caption("SCORE_a: " + str(score_a) +" SCORE_b: " + str(score_b))
         pygame.display.update()
-        clock.tick(500000)
+        clock.tick(10)
         
         
         return snake_position_a, score_a, snake_position_b, score_b, apple_position

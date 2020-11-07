@@ -39,17 +39,17 @@ with open("training_data_y_b.csv", 'w', newline='') as y_file:
     wr.writerow(training_data_y_b)
 """
 
-print(len(np.array(training_data_x).reshape(-1,11)))
-print(len(np.array(training_data_y).reshape(-1,3)))
+#print(len(np.array(training_data_x).reshape(-1,7)))
+#print(len(np.array(training_data_y).reshape(-1,3)))
 
 model = Sequential()
-model.add(Dense(units=13,input_dim=11))
+model.add(Dense(units=9,input_dim=7))
 
-model.add(Dense(units=20, activation='relu'))
+model.add(Dense(units=15, activation='relu'))
 model.add(Dense(3,  activation = 'softmax'))
 
 model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
-model.fit((np.array(training_data_x).reshape(-1,11)),( np.array(training_data_y).reshape(-1,3)), batch_size = 256,epochs= 3)
+model.fit((np.array(training_data_x).reshape(-1,7)),( np.array(training_data_y).reshape(-1,3)), batch_size = 256,epochs= 100)
 
 model.save_weights('model.h5')
 model_json = model.to_json()
