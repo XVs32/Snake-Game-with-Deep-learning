@@ -110,7 +110,7 @@ def get_direction_distance(snake_position, rival_snake_position, current_directi
         if collision_with_boundaries(next_step) == 1 \
         or collision_with_self(next_step.tolist(), snake_position) == 1 \
         or collision_with_self(next_step.tolist(), rival_snake_position) == 1:
-            return i
+            return (51 - i)/50
 
 def generate_random_direction(snake_position, angle_with_apple):
     direction = 0

@@ -16,6 +16,7 @@ from keras.layers import Dense
 
 	
 from game import *
+from training_data import generate_training_data_y
 from keras.models import model_from_json
 
 def run_game_with_ML(model, display, clock):
@@ -24,13 +25,13 @@ def run_game_with_ML(model, display, clock):
 	
 	training_data_x = []
 	training_data_y = []
-	test_games = 10
+	test_games = 1000
 	steps_per_game = 2000
 
 	counter_x = 0
 	counter_y = 0
 
-	for _ in range(test_games):
+	for _ in tqdm(range(test_games)):
 		snake_start_a, snake_position_a, score_a, snake_start_b, snake_position_b, score_b, apple_position= starting_positions()
 		
 		count_same_direction = 0
@@ -43,12 +44,21 @@ def run_game_with_ML(model, display, clock):
 
 		for _ in range(steps_per_game):
 			
+			flag = 0
+			
 			if collision_with_boundaries(snake_position_a[0]) == 1\
-			or collision_with_boundaries(snake_position_b[0]) == 1\
 			or collision_with_self(snake_position_a[0], snake_position_a[1:]) == 1\
-			or collision_with_self(snake_position_a[0], snake_position_b) == 1\
+			or collision_with_self(snake_position_a[0], snake_position_b) == 1:
+				score_a -= 10
+				flag = 1
+				
+			if collision_with_boundaries(snake_position_b[0]) == 1\
 			or collision_with_self(snake_position_b[0], snake_position_a) == 1\
 			or collision_with_self(snake_position_b[0], snake_position_b[1:]) == 1:
+				score_b -= 10
+				flag = 1
+			
+			if flag == 1:
 				if score_a < 4 and score_b < 4:
 					print("Info: didn't get any score")
 					break
@@ -70,8 +80,10 @@ def run_game_with_ML(model, display, clock):
 						training_data_y.append(i)
 						counter_y += 1
 
-				print("counter_x: " + str(counter_x))
-				print("counter_y: " + str(counter_y))
+				#print("counter_x: " + str(counter_x))
+				#print("counter_y: " + str(counter_y))
+				print("score_a: " + str(score_a))
+				print("score_b: " + str(score_b))
 				break
 			
 ###########################################################################################################
@@ -87,11 +99,13 @@ def run_game_with_ML(model, display, clock):
 				= angle_with_apple(snake_position_a, apple_position)
 			
 			predictions = []
-			
-			predicted_direction = np.argmax(np.array(model.predict(np.array([front_blocked_distance_a, \
-																			 left_blocked_distance_a, right_blocked_distance_a,\
-																			 snake_direction_vector_normalized_a[0], apple_direction_vector_normalized_a[0],\
-																			 snake_direction_vector_normalized_a[1], apple_direction_vector_normalized_a[1]]).reshape(-1,7)))) - 1
+			predicted_direction = np.argmax(np.array(model.predict(np.array([left_blocked_distance_a, front_blocked_distance_a, \
+																 right_blocked_distance_a,
+																 apple_direction_vector_normalized_a[0], \
+																 snake_direction_vector_normalized_a[0],
+																 apple_direction_vector_normalized_a[1], \
+																 snake_direction_vector_normalized_a[
+																	 1]]).reshape(-1, 7)))) - 1
 			
 			new_direction = np.array(snake_position_a[0]) - np.array(snake_position_a[1])
 			if predicted_direction == -1:
@@ -140,25 +154,13 @@ def run_game_with_ML(model, display, clock):
 			#print("apple_direction_vector_normalized_b" + str(apple_direction_vector_normalized_b[0]) + " " + str(apple_direction_vector_normalized_b[1]))
 
 			
-			predictions = []
-			
-			predicted_direction = np.argmax(np.array(model.predict(np.array([front_blocked_distance_b, \
-																			 left_blocked_distance_b, right_blocked_distance_b,\
-																			 snake_direction_vector_normalized_b[0], apple_direction_vector_normalized_b[0],\
-																			 snake_direction_vector_normalized_b[1], apple_direction_vector_normalized_b[1]]).reshape(-1,7)))) - 1
-			
-			new_direction = np.array(snake_position_b[0]) - np.array(snake_position_b[1])
-			if predicted_direction == -1:
-				new_direction = np.array([new_direction[1], -new_direction[0]])
-				training_data_y_b.append([1, 0, 0])
-			elif predicted_direction == 1:
-				new_direction = np.array([-new_direction[1], new_direction[0]])
-				training_data_y_b.append([0, 0, 1])
-			else:
-				training_data_y_b.append([0, 1, 0])
-			
-			
-			button_direction_b = generate_button_direction(new_direction)
+			direction_b, button_direction_b = generate_random_direction(snake_position_b, angle_b)
+			direction_b, button_direction_b, training_data_y_b = generate_training_data_y(snake_position_b,angle_b,
+																								button_direction_b, direction_b,
+																								training_data_y_b, 
+																								front_blocked_distance_b,
+																								left_blocked_distance_b,
+																								right_blocked_distance_b)
 			
 			
 			
@@ -174,10 +176,8 @@ def run_game_with_ML(model, display, clock):
 			#print("finish snake B")
 			
 			
-			"""snake_position_a, score_a, snake_position_b, score_b, apple_position = play_game_without_gui(snake_start_a, snake_position_a, button_direction_a, score_a,\
-																						snake_start_b, snake_position_b, button_direction_b, score_b,\
-																						apple_position, display, clock)"""
-			
+			#play_game
+			#play_game_without_gui
 			snake_position_a, score_a, snake_position_b, score_b, apple_position = play_game(snake_start_a, snake_position_a, button_direction_a, score_a,\
 																						snake_start_b, snake_position_b, button_direction_b, score_b,\
 																						apple_position, display, clock)
@@ -191,6 +191,10 @@ def run_game_with_ML(model, display, clock):
 
 
 
+import csv
+
+import os
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
 display_width = 500
@@ -204,7 +208,7 @@ print("finish init")
 training_data_x = []
 training_data_y = []
 
-for i in range(3):
+for i in range(1,10000):
 	
 	json_file = open('model_' + str(i) + '.json', 'r')
 	loaded_json_model = json_file.read()
@@ -212,11 +216,20 @@ for i in range(3):
 	model.load_weights('model_' + str(i) + '.h5')
 	
 	max_score, avg_score, training_data_x, training_data_y = run_game_with_ML(model,display,clock)
+	
+	with open("training_data_x_" + str(i) + ".csv", "w", newline="") as f:
+		writer = csv.writer(f)
+		writer.writerows(training_data_x)
+
+	with open("training_data_y_" + str(i) + ".csv", "w", newline="") as f:
+		writer = csv.writer(f)
+		writer.writerows(training_data_y)
+		
 	print("Maximum score achieved is:  ", max_score)
 	print("Average score achieved is:  ", avg_score)
 	
 	model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
-	model.fit((np.array(training_data_x).reshape(-1,7)),( np.array(training_data_y).reshape(-1,3)), batch_size = 10,epochs= 3)
+	model.fit((np.array(training_data_x).reshape(-1,7)),( np.array(training_data_y).reshape(-1,3)), batch_size = 256,epochs= 10)
 	model.save_weights('model_' + str(i+1) + '.h5')
 	model_json = model.to_json()
 	with open('model_' + str(i+1) + '.json', 'w') as json_file:

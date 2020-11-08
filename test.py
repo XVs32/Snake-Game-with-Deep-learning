@@ -1,5 +1,6 @@
-import tensorflow as tf
-from keras.backend.tensorflow_backend import set_session
+import tensorflow.compat.v1 as tf
+import tensorflow
+from tensorflow.compat.v1.keras.backend import set_session
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
 config.log_device_placement = True  # to log device placement (on which device the operation ran)
@@ -8,17 +9,24 @@ sess = tf.Session(config=config)
 set_session(sess)  # set this TensorFlow session as the default session for Keras
 
 
-
 from game import *
+from training_data import generate_training_data
+
+from keras.models import Sequential
+from keras.layers import Dense
+
+	
 from keras.models import model_from_json
+
+
 
 def run_game_with_ML(model, display, clock):
     max_score = 3
     avg_score = 0
-    test_games = 1000
+    test_games = 10
     steps_per_game = 2000
 
-    for _ in range(test_games):
+    for i in range(test_games):
         snake_start, snake_position, apple_position, score = starting_positions()
 
         count_same_direction = 0
@@ -26,7 +34,7 @@ def run_game_with_ML(model, display, clock):
 
         for _ in range(steps_per_game):
             current_direction_vector, is_front_blocked, is_left_blocked, is_right_blocked = blocked_directions(
-                snake_position)
+                snake_position,snake_position)
             angle, snake_direction_vector, apple_direction_vector_normalized, snake_direction_vector_normalized = angle_with_apple(
                 snake_position, apple_position)
             predictions = []
@@ -57,11 +65,15 @@ def run_game_with_ML(model, display, clock):
             if collision_with_boundaries(snake_position[0]) == 1 or collision_with_self(next_step.tolist(),
                                                                                         snake_position) == 1:
                 break
-            snake_position, apple_position, score = play_game(snake_start, snake_position, apple_position,
+            
+            #play_game
+            #play_game_without_gui
+            snake_position, apple_position, score = play_game_without_gui(snake_start, snake_position, apple_position,
                                                               button_direction, score, display, clock)
 
             if score > max_score:
                 max_score = score
+                i = 0
 
         avg_score += score
 
